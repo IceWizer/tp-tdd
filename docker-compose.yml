@@ -1,0 +1,53 @@
+services:
+  web:
+    image: httpd:2.4
+    ports:
+      - "80:80"
+    volumes:
+      - .:/var/www/html
+      - ./docker/web/conf/httpd.conf:/usr/local/apache2/conf/httpd.conf
+    depends_on:
+      - php
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html/public
+  php:
+    build: .
+    volumes:
+      - .:/var/www/html:rw
+    depends_on:
+      - db
+    links:
+      - "db:database"
+    ports:
+      - "9003:9003"
+    user: 1000:1000
+  db:
+    image: mysql:8.3
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+    volumes:
+      - db-volume:/var/lib/mysql
+  adminer:
+    image: adminer
+    ports:
+      - 18080:8080
+    depends_on:
+      - db
+    links:
+      - "db:database"
+  mailpit:
+    image: axllent/mailpit
+    restart: unless-stopped
+    ports:
+      - 8025:8025
+      - 1025:1025
+
+volumes:
+  db-volume: {}

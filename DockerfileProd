@@ -1,0 +1,32 @@
+FROM php:8.3.3-fpm-alpine
+LABEL authors="Florian Charlot"
+
+COPY --from=composer:2.1.9 /usr/bin/composer /usr/bin/composer
+
+RUN apk add --no-cache \
+	bash \
+	curl \
+	git \
+	libzip-dev \
+	unzip \
+	zip \
+	&& docker-php-ext-install \
+	pdo_mysql \
+	zip \
+	&& rm -rf /var/cache/apk/*
+
+COPY ./ /var/www/html/
+
+RUN curl -sS https://get.symfony.com/cli/installer | bash && mv /root/.symfony5/bin/symfony /usr/local/bin/symfony \
+    && composer install --no-interaction
+
+EXPOSE 80
+
+# Entrypoint script
+RUN mkdir -p /docker/php
+COPY --chmod=755 docker/php/entrypoint.sh /docker/php/entrypoint.sh
+
+COPY docker/php/conf.d/php.prod.ini /usr/local/etc/php/php.ini
+COPY docker/php/conf.d/www.conf /usr/local/etc/php-fpm.d/
+
+ENTRYPOINT ["/docker/php/entrypoint.sh"]
