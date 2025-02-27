@@ -2,12 +2,9 @@
 
 namespace App\Service\Validator;
 
-class Isbn13Validator
+class Isbn13Validator extends IsbnValidator
 {
-    private function validateFormat(string $isbn): bool
-    {
-        return preg_match('/^[0-9]{13}$/', $isbn) === 1;
-    }
+    protected string $isbnRegex = '/^(978|979)\d{10}$/';
 
     public function validate(string $isbn): bool
     {
