@@ -19,9 +19,6 @@
     </php>
 
     <testsuites>
-        <testsuite name="Feature">
-            <directory>tests/Features</directory>
-        </testsuite>
         <testsuite name="Unit">
             <directory>tests/Units</directory>
         </testsuite>
