@@ -16,28 +16,26 @@ class BookRepository extends ServiceEntityRepository
         parent::__construct($registry, Book::class);
     }
 
-    //    /**
-    //     * @return Book[] Returns an array of Book objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('b')
-    //            ->andWhere('b.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('b.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findByTitleAuthorAndIsbn(string $title, string $author, string $isbn)
+    {
 
-    //    public function findOneBySomeField($value): ?Book
-    //    {
-    //        return $this->createQueryBuilder('b')
-    //            ->andWhere('b.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        $queryBuilder = $this->createQueryBuilder('b');
+
+        if (!empty($title)) {
+            $queryBuilder->andWhere('b.title LIKE :title')
+                ->setParameter('title', "%$title%");
+        }
+
+        if (!empty($author)) {
+            $queryBuilder->andWhere('b.author LIKE :author')
+                ->setParameter('author', "%$author%");
+        }
+
+        if (!empty($isbn)) {
+            $queryBuilder->andWhere('b.isbn = :isbn')
+                ->setParameter('isbn', $isbn);
+        }
+
+        return $queryBuilder->getQuery()->getResult();
+    }
 }

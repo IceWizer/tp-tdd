@@ -25,9 +25,10 @@ class ReservationService
     public function makeReservation(User $user, Book $book)
     {
 
-        $currentReservations = $this->reservationRepository->countActiveReservationsByUser($user);
+        $currentReservationsForMember = $this->reservationRepository->countActiveReservationsByUser($user);
+        $isBookReserved = $this->reservationRepository->countActiveReservationsByBook($book) > 0;
 
-        if ($currentReservations >= 3) {
+        if ($currentReservationsForMember >= 3 || $isBookReserved) {
             return false;
         }
 
